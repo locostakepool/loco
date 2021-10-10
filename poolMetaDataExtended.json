@@ -21,20 +21,13 @@
             "vat_id": ""
         },
         "about": {
-            "me": "",
+            "me": "LocoNutz NFT Staking Pool run by LordForAll",
             "server": "",
             "company": ""
-        }
-    },
+        },
     "my-pool-ids": {
         "0": "68cc6dc773c067328a43e5e21086b515d23f8326c59035245996f34b",
         "1": ""
-    },
-    "when-satured-then-recommend": {
-        "0": "",
-        "1": ""
-    },
-    "telegram-admin-handle": {
-        "0": ""
+      }
     }
 }
