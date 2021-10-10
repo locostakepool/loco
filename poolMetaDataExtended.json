@@ -5,9 +5,36 @@
         "location": "Decentralised",
         "social": {
             "twitter_handle": "LocoNutzNFT",
-            "discord_handle": "https://discord.gg/E8NdDFjB"
+            "telegram_handle": "",
+            "facebook_handle": "",
+            "youtube_handle": "",
+            "twitch_handle": "",
+            "discord_handle": "https://discord.gg/E8NdDFjB",
+            "github_handle": ""
+        },
+        "company": {
+            "name": "",
+            "addr": "",
+            "city": "",
+            "country": "",
+            "company_id": "",
+            "vat_id": ""
+        },
+        "about": {
+            "me": "",
+            "server": "",
+            "company": ""
+        }
     },
     "my-pool-ids": {
-        "0": "68cc6dc773c067328a43e5e21086b515d23f8326c59035245996f34b"
+        "0": "68cc6dc773c067328a43e5e21086b515d23f8326c59035245996f34b",
+        "1": ""
+    },
+    "when-satured-then-recommend": {
+        "0": "",
+        "1": ""
+    },
+    "telegram-admin-handle": {
+        "0": ""
     }
 }
