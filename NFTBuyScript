@@ -1,28 +1,52 @@
-###################################
-#
+######################################################################
+######################################################################
 # NFT BUY SCRIPT 3Degen
-#
-###################################
+######################################################################
+######################################################################
+# Notes
+# This should be run in the directory with your "payment.skey"
+# This script will break when you have NFT in your wallet, still neeed
+# to work that one out :)
+# @LordForAll - CNFT Stake pool
 
 
-################################### NFT Variables
-NFTcost=50000000
-MINTaddr=addr1vxc4nyycc5hpnjpjpz567w9slrtyx0dhyckdalaz3g7xjksf8m2ek
 
-################################### Get the protocol parameters and save them to protocol.json
+###################################################################### 
+# NFT Variables
+###################################################################### 
+
+# Your own ADA address where you want the UTxO change to go to
+CHANGEaddr=addr1qxsrrmx4qa730pnpe55tyauqlplnsgcwavcjdjmh8xjx4c4alf32zg34la8v8u7k8plyacyykm9sfg49yv9wn3nnjn0qnpa8vl
+
+# ADA in lovelace - 1 ADA = 1000000
+NFTcost=1000000
+
+# address to send ADA to mint
+MINTaddr=addr1qxsrrmx4qa730pnpe55tyauqlplnsgcwavcjdjmh8xjx4c4alf32zg34la8v8u7k8plyacyykm9sfg49yv9wn3nnjn0qnpa8vl
+
+
+
+###################################################################### 
+# Get the protocol parameters and save them to params.json
+###################################################################### 
 
 cardano-cli query protocol-parameters \
     --mainnet \
-    --out-file protocol.json
+    --out-file params.json
 
-################################### You need to find the tip of the blockchain to set the invalid-hereafter parameter properly
+###################################################################### 
+# You need to find the tip of the blockchain to set the invalid-hereafter parameter properly
+###################################################################### 
+
 currentSlot=$(cardano-cli query tip --mainnet | jq -r '.slot')
 echo Current Slot: $currentSlot
 
-################################### Find your balance and UTXOs
+###################################################################### 
+# Find your balance and UTXOs
+###################################################################### 
 
 cardano-cli query utxo \
-    --address $(cat payment.addr) \
+    --address $CHANGEaddr \
     --mainnet > fullUtxo.out
 
 tail -n +3 fullUtxo.out | sort -k3 -nr > balance.out
@@ -44,15 +68,21 @@ txcnt=$(cat balance.out | wc -l)
 echo Total ADA balance: ${total_balance}
 echo Number of UTXOs: ${txcnt}
 
-################################### Build Draft
+###################################################################### 
+Build Draft
+######################################################################
+
 cardano-cli transaction build-raw \
 ${tx_in} \
---tx-out $(cat payment.addr)+${total_balance} \
+--tx-out $CHANGEaddr+${total_balance} \
 --invalid-hereafter $(( ${currentSlot} + 10000)) \
 --fee 0 \
 --out-file tx.draft
 
-################################### Calculate the minimum fee
+###################################################################### 
+# Calculate the minimum fee
+######################################################################
+
 fee=$(cardano-cli transaction calculate-min-fee \
     --tx-body-file tx.draft \
     --tx-in-count ${txcnt} \
@@ -63,27 +93,38 @@ fee=$(cardano-cli transaction calculate-min-fee \
     --protocol-params-file params.json | awk '{ print $1 }')
 echo fee: $fee
 
-################################### Calculate your change output
+###################################################################### 
+# Calculate your change output
+###################################################################### 
+
 txOut=$((${total_balance}-${fee}))
 echo txOut: ${txOut}
 
-################################### Build the transaction
+###################################################################### 
+# Build the transaction
+###################################################################### 
 cardano-cli transaction build-raw \
     ${tx_in} \
     --tx-out $MINTaddr+$NFTcost \
-    --tx-out $(cat payment.addr)+$(( ${txOut} - $NFTcost)) \
+    --tx-out $CHANGEaddr+$(( ${txOut} - $NFTcost)) \
     --invalid-hereafter $(( ${currentSlot} + 10000)) \
     --fee ${fee} \
     --out-file tx.raw
 
-################################### Sign the tx
+###################################################################### 
+# Sign the tx
+###################################################################### 
+
 cardano-cli transaction sign \
     --tx-body-file tx.raw \
     --signing-key-file payment.skey \
     --mainnet \
     --out-file tx.signed
 	
-################################### Submit the tx
+###################################################################### 
+# Submit the tx
+###################################################################### 
+
 cardano-cli transaction submit \
     --tx-file tx.signed \
     --mainnet
